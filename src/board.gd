@@ -23,10 +23,9 @@ var board_id: int = 0  # Used for different random spawning
 
 var grid_tile_positions: Array[Vector2]
 var tiles: Array[Tile]
+var frozen_tiles: Array[RigidBody2D] = []
 
 func _ready() -> void:
-	grid_tile_positions = generate_grid_tile_positions()
-	spawn_placeholders(grid_tile_positions)
 	tiles = []
 	tiles.resize(GRID_SIZE * GRID_SIZE)
 	reset_game()
@@ -47,15 +46,17 @@ func process_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("right"):
 		step_game(Direction.RIGHT)
 
-func generate_grid_tile_positions() -> Array[Vector2]:
-	var positions: Array[Vector2] = []
-	positions.resize(GRID_SIZE * GRID_SIZE)
-	for y in GRID_SIZE:
-		for x in GRID_SIZE:
-			var grid_position = Vector2(TILE_OFFSET, TILE_OFFSET) + Vector2(x * TILE_SPACING, y * TILE_SPACING)
-			positions[y * GRID_SIZE + x] = grid_position
-	return positions
-
+func get_dynamic_tile_sizes() -> Dictionary:
+	# Get the size of one grid cell
+	var control_cell = $GridContainer.get_child(0)
+	var cell_size = control_cell.size
+	
+	return {
+		1: cell_size,                                    # 1 cell
+		2: Vector2(cell_size.x * 2, cell_size.y),      # 2 cells wide
+		3: Vector2(cell_size.x * 3, cell_size.y),      # 3 cells wide
+	}
+	
 func reset_game():
 	for tile in tiles:
 		if tile != null:
@@ -91,7 +92,15 @@ func spawn_new_tile() -> void:
 	
 	var tile = TILE_SCENE.instantiate()
 	control_cell.add_child(tile)
-	tile.value = randi_range(1, 3)
+	
+	var value = randi_range(1, 3)
+	tile.value = value
+	
+	# Set size based on grid cells
+	var dynamic_sizes = get_dynamic_tile_sizes()
+	tile.set_custom_size(dynamic_sizes[value])
+	
+	tile.freeze = true
 
 func get_empty_control_indices() -> Array:
 	var empty_indices = []
@@ -102,17 +111,20 @@ func get_empty_control_indices() -> Array:
 	return empty_indices
 
 func step_game(direction: Direction) -> void:
+		# Only unfreeze the new tiles
+	for tile in frozen_tiles:
+		if tile != null:
+			tile.freeze = false
+	
+	# Clear the list since they're all unfrozen now
+	frozen_tiles.clear()
+	
 	match direction:
-		Direction.UP:
-			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(0,-1))
-		Direction.DOWN:
-			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(0,1))
-		Direction.LEFT:
-			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(-1,0))
-		Direction.RIGHT:
-			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(1,0))
+		Direction.UP: $GridContainer.rotation_degrees = 180
+		Direction.DOWN: $GridContainer.rotation_degrees = 0  
+		Direction.LEFT: $GridContainer.rotation_degrees = 90
+		Direction.RIGHT: $GridContainer.rotation_degrees = -90
 	spawn_new_tile()
-	# No game over check for continuous play
 
 func slice(index: int, direction: Direction) -> Array:
 	if index < 0 or index >= GRID_SIZE:

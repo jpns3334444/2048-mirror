@@ -1,13 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://2vkr7hs7nw51"]
+[gd_scene load_steps=3 format=3 uid="uid://2vkr7hs7nw51"]
 
 [ext_resource type="Script" uid="uid://b5sldsqsv6tbn" path="res://src/board.gd" id="1_cvmqk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1evtd"]
+size = Vector2(5, 600)
 
 [node name="Board" type="Node2D"]
 script = ExtResource("1_cvmqk")
 
 [node name="GridContainer" type="GridContainer" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 600.0
+offset_bottom = 600.0
 columns = 4
 
 [node name="Control1" type="Control" parent="GridContainer"]
@@ -57,3 +60,29 @@ layout_mode = 2
 
 [node name="Control2" type="Control" parent="GridContainer"]
 layout_mode = 2
+
+[node name="StaticBody2D" type="StaticBody2D" parent="GridContainer"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D"]
+position = Vector2(0, 300)
+shape = SubResource("RectangleShape2D_1evtd")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="GridContainer"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D2"]
+position = Vector2(600, 300)
+shape = SubResource("RectangleShape2D_1evtd")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="GridContainer"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D3"]
+position = Vector2(300, 0)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_1evtd")
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="GridContainer"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D4"]
+position = Vector2(300, 600)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_1evtd")
