@@ -5,7 +5,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qmy66"]
 size = Vector2(128, 128)
 
-[node name="Tile" type="Area2D"]
+[node name="Tile" type="RigidBody2D"]
+gravity_scale = 0.0
+lock_rotation = true
 script = ExtResource("1_af4uq")
 
 [node name="Background" type="ColorRect" parent="."]

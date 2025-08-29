@@ -21,12 +21,12 @@ var active: bool = true
 var game_over: bool = false
 var board_id: int = 0  # Used for different random spawning
 
-var tile_positions: Array[Vector2]
+var grid_tile_positions: Array[Vector2]
 var tiles: Array[Tile]
 
 func _ready() -> void:
-	tile_positions = generate_tile_positions()
-	spawn_placeholders(tile_positions)
+	grid_tile_positions = generate_grid_tile_positions()
+	spawn_placeholders(grid_tile_positions)
 	tiles = []
 	tiles.resize(GRID_SIZE * GRID_SIZE)
 	reset_game()
@@ -47,7 +47,7 @@ func process_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("right"):
 		step_game(Direction.RIGHT)
 
-func generate_tile_positions() -> Array[Vector2]:
+func generate_grid_tile_positions() -> Array[Vector2]:
 	var positions: Array[Vector2] = []
 	positions.resize(GRID_SIZE * GRID_SIZE)
 	for y in GRID_SIZE:
@@ -82,46 +82,37 @@ func spawn_placeholders(spawn_positions: Array[Vector2]) -> void:
 		add_child(placeholder)
 
 func spawn_new_tile() -> void:
-	var empty_indices = get_empty_tile_position_indices()
+	var empty_indices = get_empty_control_indices()
 	if empty_indices.is_empty():
 		return
 	
 	var index = empty_indices[randi() % empty_indices.size()]
-	var tile = TILE_SCENE.instantiate()
-	tiles[index] = tile
-	tile.position = $TileSpawnPoint.position
-	add_child(tile)
-	tile.value = randi_range(1,3)
+	var control_cell = $GridContainer.get_child(index)
 	
-	# Tile chooses its own size in _ready()
-	var tween = create_tween()
-	tween.tween_property(tile, "position", tile_positions[index], NEW_TILE_ANIMATION_TIME)
+	var tile = TILE_SCENE.instantiate()
+	control_cell.add_child(tile)
+	tile.value = randi_range(1, 3)
+
+func get_empty_control_indices() -> Array:
+	var empty_indices = []
+	for i in range(16):
+		var control_cell = $GridContainer.get_child(i)
+		if control_cell.get_child_count() == 0:  # No tile in this cell
+			empty_indices.append(i)
+	return empty_indices
 
 func step_game(direction: Direction) -> void:
-	slide_tiles_no_merge(direction)
-	var changed = sync_tile_positions()
-	if changed: 
-		spawn_new_tile()
+	match direction:
+		Direction.UP:
+			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(0,-1))
+		Direction.DOWN:
+			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(0,1))
+		Direction.LEFT:
+			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(-1,0))
+		Direction.RIGHT:
+			PhysicsServer2D.area_set_param(get_world_2d().space, PhysicsServer2D.AREA_PARAM_GRAVITY_VECTOR, Vector2(1,0))
+	spawn_new_tile()
 	# No game over check for continuous play
-
-func slide_tiles_no_merge(direction: Direction) -> void:
-	# Slide tiles without merging - just move them to fill empty spaces
-	for slice_index in range(GRID_SIZE):
-		var indices = slice(slice_index, direction)
-		var selected_tiles = []
-		
-		# Collect non-null tiles in order
-		for index in indices:
-			if tiles[index] != null:
-				selected_tiles.append(tiles[index])
-		
-		# Clear the slice
-		for index in indices:
-			tiles[index] = null
-		
-		# Place tiles back from the direction they're sliding to
-		for n in range(selected_tiles.size()):
-			tiles[indices[n]] = selected_tiles[n]
 
 func slice(index: int, direction: Direction) -> Array:
 	if index < 0 or index >= GRID_SIZE:
@@ -144,19 +135,6 @@ func tiles_at(indices: Array) -> Array:
 		if tile != null:
 			result.append(tile)
 	return result
-	
-func sync_tile_positions() -> bool:
-	var changed: bool = false
-	for index in range(tiles.size()):
-		var tile = tiles[index]
-		if tile == null:
-			continue
-		var new_position = tile_positions[index]
-		if tile.position != new_position:
-			var tween = create_tween()
-			tween.tween_property(tile, "position", new_position, MOVE_ANIMATION_TIME)
-			changed = true
-	return changed
 
 func get_tiles_info() -> Array:
 	# Return tile information for symmetry checking

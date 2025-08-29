@@ -1,5 +1,5 @@
 @tool
-extends Area2D
+extends RigidBody2D
 class_name Tile
 
 var COLORS = {
@@ -28,12 +28,7 @@ func update() -> void:
 		
 		# Center the background based on its new size
 		$Background.position = -tile_size / 2
-		
-		# Create a new collision shape with the correct size
-		if $CollisionShape2D:
-			var new_shape = RectangleShape2D.new()
-			new_shape.size = tile_size
-			$CollisionShape2D.shape = new_shape
+		$CollisionShape2D.shape.size = tile_size
 	
 	# Apply color
 	if COLORS.has(value):
