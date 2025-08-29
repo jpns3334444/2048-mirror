@@ -6,4 +6,4 @@
 script = ExtResource("1_cvmqk")
 
 [node name="TileSpawnPoint" type="Marker2D" parent="."]
-position = Vector2(-128, -128)
+position = Vector2(-100, 129)

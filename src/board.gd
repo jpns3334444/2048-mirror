@@ -10,7 +10,7 @@ const NEW_TILE_ANIMATION_TIME: float = 0.25
 const MOVE_ANIMATION_TIME: float = 0.25
 
 const GRID_SIZE = 4
-const TILE_SPACING = 140
+const TILE_SPACING = 130
 const TILE_OFFSET = 64
 
 signal score_reset
@@ -86,27 +86,14 @@ func spawn_new_tile() -> void:
 	if empty_indices.is_empty():
 		return
 	
-	# Use board_id to influence random selection
-	var rng = RandomNumberGenerator.new()
-	rng.seed = Time.get_ticks_msec() + board_id * 1000
-	
-	var index = empty_indices[rng.randi() % empty_indices.size()]
+	var index = empty_indices[randi() % empty_indices.size()]
 	var tile = TILE_SCENE.instantiate()
 	tiles[index] = tile
 	tile.position = $TileSpawnPoint.position
 	add_child(tile)
+	tile.value = randi_range(1,3)
 	
-	# Spawn tiles with sizes 1, 2, or 3 (representing 1x1, 2x2, 3x3 blocks)
-	var size_chances = rng.randf()
-	if size_chances < 0.5:
-		tile.value = 1  # 50% chance for size 1
-	elif size_chances < 0.85:
-		tile.value = 2  # 35% chance for size 2
-	else:
-		tile.value = 3  # 15% chance for size 3
-	
-	tile.size = tile.value  # Store size for symmetry checking
-	
+	# Tile chooses its own size in _ready()
 	var tween = create_tween()
 	tween.tween_property(tile, "position", tile_positions[index], NEW_TILE_ANIMATION_TIME)
 
@@ -176,7 +163,7 @@ func get_tiles_info() -> Array:
 	var info = []
 	for tile in tiles:
 		if tile != null:
-			info.append({"size": tile.size})
+			info.append({"size": tile.value})
 		else:
 			info.append(null)
 	return info
