@@ -35,31 +35,6 @@ func handle_dual_board_input(event: InputEvent) -> void:
 		
 		# After movement, check for symmetry
 		await get_tree().create_timer(0.3).timeout  # Wait for animations
-		check_symmetry()
-
-func check_symmetry() -> void:
-	# Get tile positions from both boards
-	var board1_tiles = $Board.get_tiles_info()
-	var board2_tiles = $Board2.get_tiles_info()
-	
-	var matches_found = false
-	var positions_to_clear = []
-	
-	# Check each position for matching sizes
-	for i in range(board1_tiles.size()):
-		if board1_tiles[i] != null and board2_tiles[i] != null:
-			if board1_tiles[i].size == board2_tiles[i].size:
-				positions_to_clear.append(i)
-				matches_found = true
-	
-	# Clear matched tiles
-	if matches_found:
-		for pos in positions_to_clear:
-			$Board.clear_tile_at(pos)
-			$Board2.clear_tile_at(pos)
-			# Award points for symmetry match
-			_on_board1_score_increased(10)
-			_on_board2_score_increased(10)
 
 func _on_board1_score_reset() -> void:
 	$Score.reset_score()

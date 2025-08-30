@@ -56,18 +56,6 @@ func get_dynamic_tile_sizes() -> Dictionary:
 		2: Vector2(cell_size.x * 2, cell_size.y),      # 2 cells wide
 		3: Vector2(cell_size.x * 3, cell_size.y),      # 3 cells wide
 	}
-	
-func reset_game():
-	for tile in tiles:
-		if tile != null:
-			tile.queue_free()
-	tiles.clear()
-	tiles.resize(GRID_SIZE * GRID_SIZE)
-	spawn_new_tile()
-	spawn_new_tile()
-	emit_signal("score_reset")
-	game_over = false
-	active = true
 
 func spawn_new_tile() -> void:
 	var empty_cells = get_empty_cells()
@@ -76,9 +64,11 @@ func spawn_new_tile() -> void:
 	
 	var index = empty_cells[randi() % empty_cells.size()]
 	var control_cell = $GridContainer.get_child(index)
-	
 	var tile = TILE_SCENE.instantiate()
-	control_cell.add_child(tile)
+	
+	add_child(tile)
+	tile.global_position = control_cell.global_position 
+	tile.add_to_group("tiles")
 	
 	var value = randi_range(1, 3)
 	tile.value = value
@@ -90,20 +80,27 @@ func spawn_new_tile() -> void:
 	tile.freeze = true
 
 func get_empty_cells() -> Array:
-	var occupied_cells = []
 	var empty_cells = []
-
-	for child in get_children():
-		if child is Tile:
-			var grid_x = int(child.position.x / cell_size.x)
-			var grid_y = int(child.position.y / cell_size.y)
-			var grid_index = grid_y * 4 + grid_x
-			occupied_cells.append(grid_index)
 	
-	for i in range (16):
-		if not occupied_cells.has(i):
-			empty_cells.append(i)
+	for i in range($GridContainer.get_child_count()):
+		var child = $GridContainer.get_child(i)
+		
+		# Skip if it's not a Control node (skip the StaticBody2D walls)
+		if not child is Control:
+			continue
 			
+		var current_cell = child
+		var cell_rect = Rect2(current_cell.global_position, current_cell.size)
+		
+		var cell_occupied = false
+		for tile in get_tree().get_nodes_in_group("tiles"):
+			if cell_rect.has_point(tile.global_position):
+				cell_occupied = true
+				break
+		
+		if not cell_occupied:
+			empty_cells.append(i)
+	
 	return empty_cells
 
 func step_game(direction: Direction) -> void:
@@ -136,29 +133,14 @@ func slice(index: int, direction: Direction) -> Array:
 	else:
 		return []
 
-func tiles_at(indices: Array) -> Array:
-	var result = []
-	for index in indices:
-		var tile = tiles[index]
-		if tile != null:
-			result.append(tile)
-	return result
-
-func get_tiles_info() -> Array:
-	# Return tile information for symmetry checking
-	var info = []
-	for tile in tiles:
-		if tile != null:
-			info.append({"size": tile.value})
-		else:
-			info.append(null)
-	return info
-
-func clear_tile_at(index: int) -> void:
-	# Clear a tile at a specific index (for symmetry matches)
-	if index >= 0 and index < tiles.size() and tiles[index] != null:
-		tiles[index].destroy()
-		tiles[index] = null
+func reset_game():
+	for tile in get_tree().get_nodes_in_group("tiles"):
+		tile.queue_free()
+	spawn_new_tile()
+	spawn_new_tile()
+	emit_signal("score_reset")
+	game_over = false
+	active = true
 
 func check_game_over() -> void:
 	# Disabled for continuous play
