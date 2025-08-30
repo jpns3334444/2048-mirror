@@ -1,118 +1,104 @@
 [gd_scene load_steps=3 format=3 uid="uid://2vkr7hs7nw51"]
 
 [ext_resource type="Script" uid="uid://b5sldsqsv6tbn" path="res://src/board.gd" id="1_cvmqk"]
-[ext_resource type="Shape2D" uid="uid://bvbbjjfir2lfp" path="res://src/wall.tres" id="2_cbsws"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1evtd"]
+bg_color = Color(0.636097, 0.211382, 0.708833, 1)
 
 [node name="Board" type="Node2D"]
 script = ExtResource("1_cvmqk")
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="Panel" type="Panel" parent="."]
 offset_right = 800.0
 offset_bottom = 800.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_1evtd")
+
+[node name="GridContainer" type="GridContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(400, 400)
 columns = 4
 
-[node name="Control1" type="Control" parent="GridContainer"]
+[node name="Control1" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control2" type="Control" parent="GridContainer"]
+[node name="Control2" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control3" type="Control" parent="GridContainer"]
+[node name="Control3" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control4" type="Control" parent="GridContainer"]
+[node name="Control4" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control5" type="Control" parent="GridContainer"]
+[node name="Control5" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control6" type="Control" parent="GridContainer"]
+[node name="Control6" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control7" type="Control" parent="GridContainer"]
+[node name="Control7" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control8" type="Control" parent="GridContainer"]
+[node name="Control8" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control9" type="Control" parent="GridContainer"]
+[node name="Control9" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control10" type="Control" parent="GridContainer"]
+[node name="Control10" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control11" type="Control" parent="GridContainer"]
+[node name="Control11" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control12" type="Control" parent="GridContainer"]
+[node name="Control12" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control13" type="Control" parent="GridContainer"]
+[node name="Control13" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control14" type="Control" parent="GridContainer"]
+[node name="Control14" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control15" type="Control" parent="GridContainer"]
+[node name="Control15" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Control16" type="Control" parent="GridContainer"]
+[node name="Control16" type="Control" parent="Panel/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-
-[node name="StaticBody2D" type="StaticBody2D" parent="GridContainer"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D"]
-position = Vector2(800, 400)
-shape = ExtResource("2_cbsws")
-
-[node name="StaticBody2D2" type="StaticBody2D" parent="GridContainer"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D2"]
-position = Vector2(0, 400)
-shape = ExtResource("2_cbsws")
-
-[node name="StaticBody2D3" type="StaticBody2D" parent="GridContainer"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D3"]
-position = Vector2(400, 800)
-rotation = 1.5708
-shape = ExtResource("2_cbsws")
-
-[node name="StaticBody2D4" type="StaticBody2D" parent="GridContainer"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GridContainer/StaticBody2D4"]
-position = Vector2(400, 0)
-rotation = 1.5708
-shape = ExtResource("2_cbsws")

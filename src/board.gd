@@ -26,122 +26,153 @@ var frozen_tiles: Array[RigidBody2D] = []
 var cell_size: Vector2
 
 func _ready() -> void:
-	reset_game()
+    reset_game()
 
 func _input(event: InputEvent) -> void:
-	# Input is now handled by game.gd through process_input
-	pass
+    # Input is now handled by game.gd through process_input
+    pass
 
 func process_input(event: InputEvent) -> void:
-	if not active or game_over:
-		return
-	elif event.is_action_pressed("up"):
-		step_game(Direction.UP)
-	elif event.is_action_pressed("down"):
-		step_game(Direction.DOWN)
-	elif event.is_action_pressed("left"):
-		step_game(Direction.LEFT)
-	elif event.is_action_pressed("right"):
-		step_game(Direction.RIGHT)
+    if not active or game_over:
+        return
+    elif event.is_action_pressed("up"):
+        step_game(Direction.UP)
+    elif event.is_action_pressed("down"):
+        step_game(Direction.DOWN)
+    elif event.is_action_pressed("left"):
+        step_game(Direction.LEFT)
+    elif event.is_action_pressed("right"):
+        step_game(Direction.RIGHT)
 
 func get_dynamic_tile_sizes() -> Dictionary:
-	# Get the size of one grid cell
-	var control_cell = $GridContainer.get_child(0)
-	var cell_size = $GridContainer.size/$GridContainer.columns
-	print(cell_size)
-	
-	return {
-		1: cell_size,                                    # 1 cell
-		2: Vector2(cell_size.x * 2, cell_size.y),      # 2 cells wide
-		3: Vector2(cell_size.x * 3, cell_size.y),      # 3 cells wide
-	}
+    # Get the size of one grid cell
+    var control_cell = $Panel/GridContainer.get_child(0)
+    var cell_size = $Panel/GridContainer.size/$Panel/GridContainer.columns
+    print(cell_size)
+    
+    return {
+        1: cell_size,                                    # 1 cell
+        2: Vector2(cell_size.x * 2, cell_size.y),      # 2 cells wide
+        3: Vector2(cell_size.x * 3, cell_size.y),      # 3 cells wide
+    }
 
 func spawn_new_tile() -> void:
-	var empty_cells = get_empty_cells()
-	if empty_cells.is_empty():
-		return
-	
-	var index = empty_cells[randi() % empty_cells.size()]
-	var control_cell = $GridContainer.get_child(index)
-	var tile = TILE_SCENE.instantiate()
-	
-	add_child(tile)
-	tile.global_position = control_cell.global_position 
-	tile.add_to_group("tiles")
-	
-	var value = randi_range(1, 3)
-	tile.value = value
-	
-	# Set size based on grid cells
-	var dynamic_sizes = get_dynamic_tile_sizes()
-	tile.set_custom_size(dynamic_sizes[value])
-	
-	tile.freeze = true
-	frozen_tiles.append(tile)
+    var empty_cells = get_empty_cells()
+    if empty_cells.is_empty():
+        return
+    
+    var index = empty_cells[randi() % empty_cells.size()]
+    var control_cell = $Panel/GridContainer.get_child(index)
+    var tile = TILE_SCENE.instantiate()
+    
+    add_child(tile)
+    tile.global_position = control_cell.global_position 
+    tile.add_to_group("tiles")
+    
+    var value = randi_range(1, 3)
+    tile.value = value
+    
+    # Set size based on grid cells
+    var dynamic_sizes = get_dynamic_tile_sizes()
+    tile.set_custom_size(dynamic_sizes[value])
+    
+    tile.freeze = true
+    frozen_tiles.append(tile)
+
+func _physics_process(delta):
+   var grid_bounds = get_grid_bounds()
+   
+   for tile in get_tree().get_nodes_in_group("tiles"):
+       var pos = tile.global_position
+       var corrected = false
+       
+       # Clamp position to boundaries
+       if pos.x < grid_bounds.position.x:
+           tile.global_position.x = grid_bounds.position.x
+           tile.linear_velocity.x = abs(tile.linear_velocity.x) * 0.3  # Bounce back with damping
+           corrected = true
+       elif pos.x > grid_bounds.position.x + grid_bounds.size.x:
+           tile.global_position.x = grid_bounds.position.x + grid_bounds.size.x
+           tile.linear_velocity.x = -abs(tile.linear_velocity.x) * 0.3
+           corrected = true
+           
+       if pos.y < grid_bounds.position.y:
+           tile.global_position.y = grid_bounds.position.y
+           tile.linear_velocity.y = abs(tile.linear_velocity.y) * 0.3
+           corrected = true
+       elif pos.y > grid_bounds.position.y + grid_bounds.size.y:
+           tile.global_position.y = grid_bounds.position.y + grid_bounds.size.y
+           tile.linear_velocity.y = -abs(tile.linear_velocity.y) * 0.3
+           corrected = true
+
+func get_grid_bounds() -> Rect2:
+   return Rect2($Panel/GridContainer.global_position, $Panel/GridContainer.size)
 
 func get_empty_cells() -> Array:
-	var empty_cells = []
-	
-	for i in range($GridContainer.get_child_count()):
-		var child = $GridContainer.get_child(i)
-		
-		# Skip if it's not a Control node (skip the StaticBody2D walls)
-		if not child is Control:
-			continue
-			
-		var current_cell = child
-		var cell_rect = Rect2(current_cell.global_position, current_cell.size)
-		
-		var cell_occupied = false
-		for tile in get_tree().get_nodes_in_group("tiles"):
-			if cell_rect.has_point(tile.global_position):
-				cell_occupied = true
-				break
-		
-		if not cell_occupied:
-			empty_cells.append(i)
-	
-	return empty_cells
+    var empty_cells = []
+    
+    for i in range($Panel/GridContainer.get_child_count()):
+        var child = $Panel/GridContainer.get_child(i)
+        
+        # Skip if it's not a Control node (skip the StaticBody2D walls)
+        if not child is Control:
+            continue
+            
+        var current_cell = child
+        var cell_rect = Rect2(current_cell.global_position, current_cell.size)
+        
+        var cell_occupied = false
+        for tile in get_tree().get_nodes_in_group("tiles"):
+            if cell_rect.has_point(tile.global_position):
+                cell_occupied = true
+                break
+        
+        if not cell_occupied:
+            empty_cells.append(i)
+    
+    return empty_cells
 
 func step_game(direction: Direction) -> void:
-	# Unfreeze freshly spawned tile
-	for tile in frozen_tiles:
-		if tile != null:
-			tile.freeze = false
-	
-	# Clear the list since they're all unfrozen now
-	frozen_tiles.clear()
-	
-	match direction:
-		Direction.UP: $GridContainer.rotation_degrees = 180
-		Direction.DOWN: $GridContainer.rotation_degrees = 0  
-		Direction.LEFT: $GridContainer.rotation_degrees = 90
-		Direction.RIGHT: $GridContainer.rotation_degrees = -90
-	spawn_new_tile()
+    print("Before - GridContainer global_position: ", $Panel/GridContainer.global_position)
+    # Unfreeze freshly spawned tile
+    for tile in frozen_tiles:
+        if tile != null:
+            tile.freeze = false
+    
+    # Clear the list since they're all unfrozen now
+    frozen_tiles.clear()
+    
+    match direction:
+          Direction.UP: $Panel.rotation_degrees = 180
+          Direction.DOWN: $Panel.rotation_degrees = 0  
+          Direction.LEFT: $Panel.rotation_degrees = 90
+          Direction.RIGHT: $Panel.rotation_degrees = -90
+    spawn_new_tile()
+    print("After - GridContainer global_position: ", $Panel/GridContainer.global_position)  
 
 func slice(index: int, direction: Direction) -> Array:
-	if index < 0 or index >= GRID_SIZE:
-		return []
-	elif direction == Direction.UP:
-		return range(index, GRID_SIZE * GRID_SIZE + index, GRID_SIZE)
-	elif direction == Direction.DOWN:
-		return range(GRID_SIZE * GRID_SIZE - index - 1, -1, -GRID_SIZE)
-	elif direction == Direction.LEFT:
-		return range(index * GRID_SIZE, index * GRID_SIZE + GRID_SIZE)
-	elif direction == Direction.RIGHT:
-		return range(index * GRID_SIZE + GRID_SIZE - 1, index * GRID_SIZE - 1, -1)
-	else:
-		return []
+    if index < 0 or index >= GRID_SIZE:
+        return []
+    elif direction == Direction.UP:
+        return range(index, GRID_SIZE * GRID_SIZE + index, GRID_SIZE)
+    elif direction == Direction.DOWN:
+        return range(GRID_SIZE * GRID_SIZE - index - 1, -1, -GRID_SIZE)
+    elif direction == Direction.LEFT:
+        return range(index * GRID_SIZE, index * GRID_SIZE + GRID_SIZE)
+    elif direction == Direction.RIGHT:
+        return range(index * GRID_SIZE + GRID_SIZE - 1, index * GRID_SIZE - 1, -1)
+    else:
+        return []
 
 func reset_game():
-	for tile in get_tree().get_nodes_in_group("tiles"):
-		tile.queue_free()
-	spawn_new_tile()
-	spawn_new_tile()
-	emit_signal("score_reset")
-	game_over = false
-	active = true
+    for tile in get_tree().get_nodes_in_group("tiles"):
+        tile.queue_free()
+    spawn_new_tile()
+    spawn_new_tile()
+    emit_signal("score_reset")
+    game_over = false
+    active = true
 
 func check_game_over() -> void:
-	# Disabled for continuous play
-	pass
+    # Disabled for continuous play
+    pass
