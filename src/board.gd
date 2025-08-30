@@ -26,6 +26,12 @@ var frozen_tiles: Array[RigidBody2D] = []
 var cell_size: Vector2
 
 func _ready() -> void:
+    $Panel.pivot_offset = $Panel.size / 2
+    print("Panel size: ", $Panel.size)
+    print("Pivot offset set to: ", $Panel.pivot_offset)
+    # Force GridContainer to calculate layout immediately
+    $Panel/GridContainer.force_update_transform()
+    await get_tree().process_frame
     reset_game()
 
 func _input(event: InputEvent) -> void:
@@ -57,16 +63,33 @@ func get_dynamic_tile_sizes() -> Dictionary:
     }
 
 func spawn_new_tile() -> void:
+    print("=== SPAWN DEBUG ===")
+    print("Board global_position: ", global_position)
+    print("Panel global_position: ", $Panel.global_position)
+    print("GridContainer global_position: ", $Panel/GridContainer.global_position)
+    print("Panel size: ", $Panel.size)
+    print("Panel position: ", $Panel.position)
+    print("GridContainer size: ", $Panel/GridContainer.size)
+    print("GridContainer position: ", $Panel/GridContainer.position)
+    
     var empty_cells = get_empty_cells()
     if empty_cells.is_empty():
         return
     
     var index = empty_cells[randi() % empty_cells.size()]
-    var control_cell = $Panel/GridContainer.get_child(index)
-    var tile = TILE_SCENE.instantiate()
+    var spawn_cell = $Panel/GridContainer.get_child(index)
     
-    add_child(tile)
-    tile.global_position = control_cell.global_position 
+    print("Spawning in cell index: ", index)
+    print("spawn_cell cell size: ", spawn_cell.size)
+    print("spawn_cell cell position: ", spawn_cell.position)
+    print("spawn_cell cell global_position: ", spawn_cell.global_position)
+    
+    var tile = TILE_SCENE.instantiate()
+    spawn_cell.add_child(tile)
+    
+    print("Tile position after spawn: ", tile.position)
+    print("Tile global_position after spawn: ", tile.global_position)
+    tile.global_position = spawn_cell.global_position 
     tile.add_to_group("tiles")
     
     var value = randi_range(1, 3)
@@ -133,7 +156,9 @@ func get_empty_cells() -> Array:
     return empty_cells
 
 func step_game(direction: Direction) -> void:
-    print("Before - GridContainer global_position: ", $Panel/GridContainer.global_position)
+    print("=== ROTATION DEBUG ===")
+    print("Before rotation:")
+    print("  Panel rotation_degrees: ", $Panel.rotation_degrees)
     # Unfreeze freshly spawned tile
     for tile in frozen_tiles:
         if tile != null:
@@ -148,7 +173,9 @@ func step_game(direction: Direction) -> void:
           Direction.LEFT: $Panel.rotation_degrees = 90
           Direction.RIGHT: $Panel.rotation_degrees = -90
     spawn_new_tile()
-    print("After - GridContainer global_position: ", $Panel/GridContainer.global_position)  
+    print("After rotation:")
+    print("  Panel rotation_degrees: ", $Panel.rotation_degrees)
+    print("=====================")
 
 func slice(index: int, direction: Direction) -> Array:
     if index < 0 or index >= GRID_SIZE:

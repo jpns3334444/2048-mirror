@@ -9,8 +9,6 @@ func _ready() -> void:
 	$Board.game_finished.connect(_on_board_game_finished)
 	
 	# Connect Board2 signals
-	$Board2.score_increased.connect(_on_board2_score_increased)
-	$Board2.score_reset.connect(_on_board2_score_reset)
 	$Board2.game_finished.connect(_on_board_game_finished)
 	
 	# Set different seeds for random tile spawning
@@ -39,14 +37,10 @@ func handle_dual_board_input(event: InputEvent) -> void:
 func _on_board1_score_reset() -> void:
 	$Score.reset_score()
 
-func _on_board2_score_reset() -> void:
-	$Score2.reset_score()
 
 func _on_board1_score_increased(amount) -> void:
 	$Score.increase_score(amount)
 
-func _on_board2_score_increased(amount) -> void:
-	$Score2.increase_score(amount)
 
 func _on_board_game_finished() -> void:
 	# Don't end game for now - continuous play
