@@ -24,10 +24,9 @@ var board_id: int = 0  # Used for different random spawning
 var grid_tile_positions: Array[Vector2]
 var tiles: Array[Tile]
 var frozen_tiles: Array[RigidBody2D] = []
+var cell_size: Vector2
 
 func _ready() -> void:
-	tiles = []
-	tiles.resize(GRID_SIZE * GRID_SIZE)
 	reset_game()
 
 func _input(event: InputEvent) -> void:
@@ -49,7 +48,8 @@ func process_input(event: InputEvent) -> void:
 func get_dynamic_tile_sizes() -> Dictionary:
 	# Get the size of one grid cell
 	var control_cell = $GridContainer.get_child(0)
-	var cell_size = control_cell.size
+	var cell_size = $GridContainer.size/$GridContainer.columns
+	print(cell_size)
 	
 	return {
 		1: cell_size,                                    # 1 cell
@@ -69,25 +69,12 @@ func reset_game():
 	game_over = false
 	active = true
 
-func get_empty_tile_position_indices() -> Array:
-	var empty_indices = []
-	for index in range(tiles.size()):
-		if tiles[index] == null:
-			empty_indices.append(index)
-	return empty_indices
-
-func spawn_placeholders(spawn_positions: Array[Vector2]) -> void:
-	for position in spawn_positions:
-		var placeholder = PLACEHOLDER_SCENE.instantiate()
-		placeholder.position = position
-		add_child(placeholder)
-
 func spawn_new_tile() -> void:
-	var empty_indices = get_empty_control_indices()
-	if empty_indices.is_empty():
+	var empty_cells = get_empty_cells()
+	if empty_cells.is_empty():
 		return
 	
-	var index = empty_indices[randi() % empty_indices.size()]
+	var index = empty_cells[randi() % empty_cells.size()]
 	var control_cell = $GridContainer.get_child(index)
 	
 	var tile = TILE_SCENE.instantiate()
@@ -102,16 +89,25 @@ func spawn_new_tile() -> void:
 	
 	tile.freeze = true
 
-func get_empty_control_indices() -> Array:
-	var empty_indices = []
-	for i in range(16):
-		var control_cell = $GridContainer.get_child(i)
-		if control_cell.get_child_count() == 0:  # No tile in this cell
-			empty_indices.append(i)
-	return empty_indices
+func get_empty_cells() -> Array:
+	var occupied_cells = []
+	var empty_cells = []
+
+	for child in get_children():
+		if child is Tile:
+			var grid_x = int(child.position.x / cell_size.x)
+			var grid_y = int(child.position.y / cell_size.y)
+			var grid_index = grid_y * 4 + grid_x
+			occupied_cells.append(grid_index)
+	
+	for i in range (16):
+		if not occupied_cells.has(i):
+			empty_cells.append(i)
+			
+	return empty_cells
 
 func step_game(direction: Direction) -> void:
-		# Only unfreeze the new tiles
+	# Unfreeze freshly spawned tile
 	for tile in frozen_tiles:
 		if tile != null:
 			tile.freeze = false
