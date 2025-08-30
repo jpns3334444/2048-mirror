@@ -1,4 +1,3 @@
-@tool
 extends Node2D
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
@@ -78,6 +77,7 @@ func spawn_new_tile() -> void:
 	tile.set_custom_size(dynamic_sizes[value])
 	
 	tile.freeze = true
+	frozen_tiles.append(tile)
 
 func get_empty_cells() -> Array:
 	var empty_cells = []
