@@ -15,51 +15,83 @@ columns = 4
 
 [node name="Control1" type="Control" parent="GridContainer"]
 layout_mode = 2
-
-[node name="Control16" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control4" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control5" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control6" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control7" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control8" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control9" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control10" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control11" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control12" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control13" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control14" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control15" type="Control" parent="GridContainer"]
-layout_mode = 2
-
-[node name="Control3" type="Control" parent="GridContainer"]
-layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="Control2" type="Control" parent="GridContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control3" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control4" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control5" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control6" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control7" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control8" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control9" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control10" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control11" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control12" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control13" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control14" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control15" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control16" type="Control" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="StaticBody2D" type="StaticBody2D" parent="GridContainer"]
 

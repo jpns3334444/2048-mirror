@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dhayivp1gu407" path="res://src/tile.gd" id="1_af4uq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qmy66"]
-size = Vector2(300, 150)
+size = Vector2(450, 150)
 
 [node name="Tile" type="RigidBody2D"]
 lock_rotation = true
